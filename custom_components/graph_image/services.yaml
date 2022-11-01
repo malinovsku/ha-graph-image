@@ -4,7 +4,7 @@ create_graph_image:
     entity:
   fields:
     in_folderfile:
-      description: Путь с именем файла для сохранения
+      description: Путь с именем файла для сохранения (!расширение .png)
       name: Путь с именем файла для сохранения
       required: false
       example: /config/www/graph.png
@@ -90,8 +90,8 @@ create_graph_image:
             - vert_first
             - flat_first
     in_rate_ticks:
-      description: Автоматичская расстановка подписи по X
-      name: Автоматичская расстановка подписи по X
+      description: Автоматическая расстановка подписи по X
+      name: Автоматическая расстановка подписи по X
       required: false
       example: False
       default: False
