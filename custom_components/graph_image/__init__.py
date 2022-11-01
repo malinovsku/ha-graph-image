@@ -32,6 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         in_linewidth = service.data.get('in_linewidth', 1) # толщина линии
         in_folderfile = service.data.get('in_folderfile', '/config/www/graph.png') # путь и имя для сохранения
         in_linesmooth = service.data.get('in_linesmooth', 1) # уровень сглаживания
+        in_lineinterp = service.data.get('in_lineinterp', 'linear_interp') # уровень сглаживания
         entity_ids = service.data["entity_id"]
 
         plt.style.use(in_style) # стиль графика
@@ -64,7 +65,12 @@ async def async_setup_entry(hass: HomeAssistant, entry):
             w=np.hanning(in_linesmooth) # сглаживание графика
             y_axis2=np.convolve(w/w.sum(),y_axis,mode='same')
 
-            ax.plot(x_axis, y_axis2, label=label_name, linewidth = in_linewidth)
+            if in_lineinterp == 'linear_interp':
+                ax.plot(x_axis, y_axis2, label=label_name, linewidth = in_linewidth)
+            else:
+                new_where = 'pre' if in_lineinterp == 'vert_first' else 'post'
+                ax.step(x_axis, y_axis2, label=label_name, where = new_where, linewidth = in_linewidth)
+
 
         # в зависимости от кол-ва дней, разницы time_end и in_start, частота делений по x
         if not in_rate_ticks:

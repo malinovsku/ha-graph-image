@@ -77,6 +77,18 @@ create_graph_image:
         number:
           min: 1
           max: 30
+    in_lineinterp:
+      description: Вид линии
+      name: Вид линии
+      required: false
+      example: linear_interp
+      default: linear_interp
+      selector:
+        select:
+          options:
+            - linear_interp
+            - vert_first
+            - flat_first
     in_rate_ticks:
       description: Автоматичская расстановка подписи по X
       name: Автоматичская расстановка подписи по X
