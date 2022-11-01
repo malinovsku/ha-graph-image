@@ -1,0 +1,87 @@
+create_graph_image:
+  description: Создать график и сохранить картинку
+  target:
+    entity:
+  fields:
+    in_folderfile:
+      description: Путь с именем файла для сохранения
+      name: Путь с именем файла для сохранения
+      required: false
+      example: /config/www/graph.png
+      default: /config/www/graph.png
+      selector:
+        text: null
+    in_time_start:
+      description: Начало графика - часов
+      name: Начало графика - часов
+      required: false
+      example: 12
+      default: 12
+      selector:
+        number:
+          min: 0
+          max: 500
+          unit_of_measurement: ч
+    in_time_end:
+      description: Конец графика - часов
+      name: Конец графика - часов
+      required: false
+      example: 0
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 500
+          unit_of_measurement: ч
+    in_style:
+      description: Стиль графика
+      required: false
+      example: Solarize_Light2
+      default: Solarize_Light2
+      selector:
+        select:
+          options:
+            - Solarize_Light2
+            - classic
+            - fast
+            - ggplot
+            - grayscale
+            - seaborn-v0_8-pastel
+    in_size_ticks:
+      description: Размер подписи осей
+      name: Размер подписи осей
+      required: false
+      example: 10
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 20
+    in_linewidth:
+      description: Толщина линии
+      name: Толщина линии
+      required: false
+      example: 1
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 5
+    in_linesmooth:
+      description: Уровень сглаживания
+      name: Уровень сглаживания
+      required: false
+      example: 1
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 30
+    in_rate_ticks:
+      description: Автоматичская расстановка подписи по X
+      name: Автоматичская расстановка подписи по X
+      required: false
+      example: False
+      default: False
+      selector:
+        boolean:

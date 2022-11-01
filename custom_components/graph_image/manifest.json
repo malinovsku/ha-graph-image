@@ -1,0 +1,11 @@
+{
+  "domain": "graph_image",
+  "name": "Graph image",
+  "config_flow": true,
+  "documentation": "https://github.com/malinovsku/ha-graph-image",
+  "issue_tracker": "https://github.com/malinovsku/ha-graph-image/issues",
+  "codeowners": ["@malinovsku"],
+  "dependencies": [],
+  "requirements": ["matplotlib","numpy","datetime"],
+  "version": "0.0.1"
+}
