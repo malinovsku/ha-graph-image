@@ -7,5 +7,5 @@
   "codeowners": ["@malinovsku"],
   "dependencies": [],
   "requirements": ["matplotlib","numpy","datetime"],
-  "version": "0.0.2"
+  "version": "0.0.3"
 }

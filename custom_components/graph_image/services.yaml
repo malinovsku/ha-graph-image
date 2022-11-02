@@ -33,20 +33,30 @@ create_graph_image:
           min: 0
           max: 500
           unit_of_measurement: ч
-    in_style:
-      description: Стиль графика
+    in_name_notify:
+      description: Имя службы notify для отправки картинки.
+      name: Имя службы notify для отправки картинки.
       required: false
-      example: Solarize_Light2
-      default: Solarize_Light2
+      example: notify
+      default: notify
       selector:
-        select:
-          options:
-            - Solarize_Light2
-            - classic
-            - fast
-            - ggplot
-            - grayscale
-            - seaborn-v0_8-pastel
+        text:
+    in_caption_notify:
+      description: По умолчанию Friendly Name + состояние.
+      name: Подпись к картинке при отправке.
+      required: false
+      example: caption
+      default: caption
+      selector:
+        text:
+    in_data_notify:
+      description: Дополнительные данные для сервиса notify.
+      name: Дополнительные данные для сервиса notify.
+      required: false
+      example: {}
+      default: {}
+      selector:
+        object:
     in_size_ticks:
       description: Размер подписи осей
       name: Размер подписи осей
@@ -97,3 +107,17 @@ create_graph_image:
       default: False
       selector:
         boolean:
+    in_style:
+      description: Стиль графика
+      required: false
+      example: Solarize_Light2
+      default: Solarize_Light2
+      selector:
+        select:
+          options:
+            - Solarize_Light2
+            - classic
+            - fast
+            - ggplot
+            - grayscale
+            - seaborn-v0_8-pastel

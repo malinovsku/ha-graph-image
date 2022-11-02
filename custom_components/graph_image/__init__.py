@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+# import os
+# import time
 
 DOMAIN = 'graph_image'
 
@@ -33,7 +35,11 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         in_folderfile = service.data.get('in_folderfile', '/config/www/graph.png') # путь и имя для сохранения
         in_linesmooth = service.data.get('in_linesmooth', 1) # уровень сглаживания
         in_lineinterp = service.data.get('in_lineinterp', 'linear_interp') # уровень сглаживания
+        in_name_notify = service.data.get('in_name_notify', False) # сервис notify для отправки после создания
+        in_caption_notify = service.data.get('in_caption_notify', False) # подпись к картинке отправленной через сервис notify
+        in_data_notify = service.data.get('in_data_notify', {}) # дополнительные данные для сервиса notify
         entity_ids = service.data["entity_id"]
+        new_caption_notify = ''
 
         plt.style.use(in_style) # стиль графика
         xFmt = mdates.DateFormatter('%m-%d %H:%M', tz=hass.config.time_zone)
@@ -62,6 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, entry):
             x_axis = np.array(x_axis)
             y_axis = np.array(y_axis).astype('float32')
             label_name = f"{obj_entity_id.attributes['friendly_name']} - {obj_entity_id.state}"
+            new_caption_notify += f"{label_name}\n"
             w=np.hanning(in_linesmooth) # сглаживание графика
             y_axis2=np.convolve(w/w.sum(),y_axis,mode='same')
 
@@ -72,7 +79,7 @@ async def async_setup_entry(hass: HomeAssistant, entry):
                 ax.step(x_axis, y_axis2, label=label_name, where = new_where, linewidth = in_linewidth)
 
 
-        # в зависимости от кол-ва дней, разницы time_end и in_start, частота делений по x
+        # в зависимости от кол-ва дней, разницы time_end и in_start, частота делений по x или пропускаем и автоматически
         if not in_rate_ticks:
             diff_day = time_end - time_start
             new_interval = 1 if diff_day.days <= 1 else diff_day.days * 2
@@ -85,6 +92,22 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         plt.clf()
         ax.cla() 
         fig.clf()
+
+        # отправка картинки через сервис notify
+        if in_name_notify:
+            in_name_notify = in_name_notify.replace('notify.', '')
+            caption_notify = in_caption_notify if in_caption_notify else new_caption_notify
+            photo = {}
+            photo['file'] = in_folderfile
+            photo['caption'] = caption_notify
+            data = {**in_data_notify}
+            data['photo'] = photo
+            data['parse_mode'] = 'html'
+            hass.services.call('notify', in_name_notify, {
+                                    "data": data,
+                                    "message": caption_notify[0:99]})
+            # time.sleep(1)
+            # os.remove(in_folderfile)
 
     hass.services.async_register(DOMAIN, 'create_graph_image', create_graph_image)
 
