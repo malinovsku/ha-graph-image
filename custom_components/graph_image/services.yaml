@@ -12,8 +12,8 @@ create_graph_image:
       selector:
         text: null
     in_time_start:
-      description: Начало графика - часов
-      name: Начало графика - часов
+      description: По умолчанию начало графика 12 часов назад
+      name: Начало графика - часов назад
       required: false
       example: 12
       default: 12
@@ -23,8 +23,8 @@ create_graph_image:
           max: 500
           unit_of_measurement: ч
     in_time_end:
-      description: Конец графика - часов
-      name: Конец графика - часов
+      description: По умолчанию график строится по текущее время
+      name: Конец графика - часов назад
       required: false
       example: 0
       default: 0
@@ -34,24 +34,24 @@ create_graph_image:
           max: 500
           unit_of_measurement: ч
     in_name_notify:
-      description: Имя службы notify для отправки картинки.
-      name: Имя службы notify для отправки картинки.
+      description: Имя службы notify для отправки картинки
+      name: Имя службы notify для отправки картинки
       required: false
       example: notify
       default: notify
       selector:
         text:
     in_caption_notify:
-      description: По умолчанию Friendly Name + состояние.
-      name: Подпись к картинке при отправке.
+      description: По умолчанию Friendly Name + состояние
+      name: Подпись к картинке при отправке
       required: false
       example: caption
       default: caption
       selector:
         text:
     in_data_notify:
-      description: Дополнительные данные для сервиса notify.
-      name: Дополнительные данные для сервиса notify.
+      description: Данные такие как теги, клавиатуры или кнопки
+      name: Дополнительные данные для сервиса notify
       required: false
       example: {}
       default: {}
@@ -109,6 +109,7 @@ create_graph_image:
         boolean:
     in_style:
       description: Стиль графика
+      name: Стиль графика
       required: false
       example: Solarize_Light2
       default: Solarize_Light2
