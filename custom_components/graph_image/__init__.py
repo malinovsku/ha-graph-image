@@ -1,7 +1,7 @@
 from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.core import HomeAssistant
 from homeassistant.core import ServiceCall
-from homeassistant.components.recorder import history
+from homeassistant.components.recorder import get_instance, history
 import homeassistant.util.dt as dt_util
 
 from datetime import timedelta
@@ -9,10 +9,12 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import logging
 # import os
 # import time
 
 DOMAIN = 'graph_image'
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass, hass_config):
     if DOMAIN in hass_config and not hass.config_entries.async_entries(DOMAIN):
@@ -24,8 +26,7 @@ async def async_setup(hass, hass_config):
 
 async def async_setup_entry(hass: HomeAssistant, entry):
 
-    def create_graph_image(service: ServiceCall) -> None:
-
+    async def create_graph_image(service: ServiceCall) -> None:
         time_start = dt_util.utcnow() - timedelta(hours=service.data.get('in_time_start', 12)) # дата начала
         time_end = dt_util.utcnow() - timedelta(hours=service.data.get('in_time_end', 0)) # дата окончания
         in_style = service.data.get('in_style', 'Solarize_Light2') # стиль графика
@@ -41,6 +42,8 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         entity_ids = service.data["entity_id"]
         plt.style.use(in_style) # стиль графика
         new_caption_notify = ''
+        include_start_time_state = True
+        no_attributes = True
 
         xFmt = mdates.DateFormatter('%m-%d %H:%M', tz=hass.config.time_zone)
         fig = plt.figure()
@@ -52,8 +55,10 @@ async def async_setup_entry(hass: HomeAssistant, entry):
 
         # проходимся по объектам, запрашиваем историю из компонента ha history и формируем график
         for row in entity_ids:
-            hist_entity = history.state_changes_during_period(hass, time_start, time_end, row, include_start_time_state=True, no_attributes=True) # запрос истории
-            label_name = f"{hist_entity[row][0].attributes['friendly_name']} - {hist_entity[row][0].state}"
+            entity = hass.states.get(row)
+            hist_entity =  await get_instance(hass).async_add_executor_job(history.state_changes_during_period, hass, time_start, time_end, row, include_start_time_state, no_attributes)
+            # _LOGGER.warning(f"create_graph_image {row} hist_entity: {hist_entity}")
+            label_name = f"{entity.attributes.get('friendly_name', row)} - {entity.state}"
             new_caption_notify += f"{label_name}\n"
             x_axis = []
             y_axis = []
