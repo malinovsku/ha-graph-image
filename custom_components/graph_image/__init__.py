@@ -10,8 +10,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import logging
-# import os
-# import time
 
 DOMAIN = 'graph_image'
 _LOGGER = logging.getLogger(__name__)
@@ -57,7 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         for row in entity_ids:
             entity = hass.states.get(row)
             hist_entity =  await get_instance(hass).async_add_executor_job(history.state_changes_during_period, hass, time_start, time_end, row, include_start_time_state, no_attributes)
-            # _LOGGER.warning(f"create_graph_image {row} hist_entity: {hist_entity}")
+            _LOGGER.debug(f"History create_graph_image {row} hist_entity: {hist_entity}")
             label_name = f"{entity.attributes.get('friendly_name', row)} - {entity.state}"
             new_caption_notify += f"{label_name}\n"
             x_axis = []
@@ -100,17 +98,17 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         if in_name_notify:
             in_name_notify = in_name_notify.replace('notify.', '')
             caption_notify = in_caption_notify if in_caption_notify else new_caption_notify
+            _LOGGER.debug(f"Send create_graph_image {in_name_notify} caption_notify: {caption_notify}")
             photo = {}
             photo['file'] = in_folderfile
             photo['caption'] = caption_notify[0:999]
             data = {**in_data_notify}
             data['photo'] = photo
             data['parse_mode'] = 'html'
-            hass.services.call('notify', in_name_notify, {
-                                    "data": data,
-                                    "message": caption_notify[0:999]})
-            # time.sleep(1)
-            # os.remove(in_folderfile)
+            await hass.services.async_call(domain='notify',
+                                            service=in_name_notify,
+                                            service_data={"data": data,
+                                                            "message": caption_notify[0:999]})
 
     hass.services.async_register(DOMAIN, 'create_graph_image', create_graph_image)
 
