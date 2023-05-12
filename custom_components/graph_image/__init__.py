@@ -34,12 +34,8 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         in_folderfile = service.data.get('in_folderfile', '/config/www/graph.png') # путь и имя для сохранения
         in_linesmooth = service.data.get('in_linesmooth', 1) # уровень сглаживания
         in_lineinterp = service.data.get('in_lineinterp', 'linear_interp') # вид графика
-        in_name_notify = service.data.get('in_name_notify', False) # сервис notify для отправки после создания
-        in_caption_notify = service.data.get('in_caption_notify', False) # подпись к картинке отправленной через сервис notify
-        in_data_notify = service.data.get('in_data_notify', {}) # дополнительные данные для сервиса notify
         entity_ids = service.data["entity_id"]
         plt.style.use(in_style) # стиль графика
-        new_caption_notify = ''
         include_start_time_state = True
         no_attributes = True
 
@@ -93,22 +89,6 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         plt.clf()
         ax.cla() 
         fig.clf()
-
-        # отправка картинки через сервис notify
-        if in_name_notify:
-            in_name_notify = in_name_notify.replace('notify.', '')
-            caption_notify = in_caption_notify if in_caption_notify else new_caption_notify
-            _LOGGER.debug(f"Send create_graph_image {in_name_notify} caption_notify: {caption_notify}")
-            photo = {}
-            photo['file'] = in_folderfile
-            photo['caption'] = caption_notify[0:999]
-            data = {**in_data_notify}
-            data['photo'] = photo
-            data['parse_mode'] = 'html'
-            await hass.services.async_call(domain='notify',
-                                            service=in_name_notify,
-                                            service_data={"data": data,
-                                                            "message": caption_notify[0:999]})
 
     hass.services.async_register(DOMAIN, 'create_graph_image', create_graph_image)
 

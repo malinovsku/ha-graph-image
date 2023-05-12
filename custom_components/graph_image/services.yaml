@@ -1,7 +1,6 @@
 create_graph_image:
   description: Создать график и сохранить картинку
   target:
-    entity:
   fields:
     in_folderfile:
       description: Путь с именем файла для сохранения (!расширение .png)
@@ -33,30 +32,6 @@ create_graph_image:
           min: 0
           max: 500
           unit_of_measurement: ч
-    in_name_notify:
-      description: Имя службы notify для отправки картинки
-      name: Имя службы notify для отправки картинки
-      required: false
-      example: notify
-      default: notify
-      selector:
-        text:
-    in_caption_notify:
-      description: По умолчанию Friendly Name + состояние
-      name: Подпись к картинке при отправке
-      required: false
-      example: caption
-      default: caption
-      selector:
-        text:
-    in_data_notify:
-      description: Данные такие как теги, клавиатуры или кнопки
-      name: Дополнительные данные для сервиса notify
-      required: false
-      example: {}
-      default: {}
-      selector:
-        object:
     in_size_ticks:
       description: Размер подписи осей
       name: Размер подписи осей
