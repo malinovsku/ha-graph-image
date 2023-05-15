@@ -53,7 +53,6 @@ async def async_setup_entry(hass: HomeAssistant, entry):
             hist_entity =  await get_instance(hass).async_add_executor_job(history.state_changes_during_period, hass, time_start, time_end, row, include_start_time_state, no_attributes)
             _LOGGER.debug(f"History create_graph_image {row} hist_entity: {hist_entity}")
             label_name = f"{entity.attributes.get('friendly_name', row)} - {entity.state}"
-            new_caption_notify += f"{label_name}\n"
             x_axis = []
             y_axis = []
             for rec in hist_entity[row]:
