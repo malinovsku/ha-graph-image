@@ -34,14 +34,16 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         in_folderfile = service.data.get('in_folderfile', '/config/www/graph.png') # путь и имя для сохранения
         in_linesmooth = service.data.get('in_linesmooth', 1) # уровень сглаживания
         in_lineinterp = service.data.get('in_lineinterp', 'linear_interp') # вид графика
+        in_size_inches = service.data.get('in_size_inches', '17,12') # размер картинки
         entity_ids = service.data["entity_id"]
+        plt.close()
         plt.style.use(in_style) # стиль графика
         include_start_time_state = True
         no_attributes = True
 
         xFmt = mdates.DateFormatter('%m-%d %H:%M', tz=hass.config.time_zone)
-        fig = plt.figure()
-        fig.set_size_inches(13.5, 7, forward=True) # размеры графика
+        fig = plt.figure(tight_layout=True)
+        fig.set_size_inches(int(in_size_inches.split(',')[0]), int(in_size_inches.split(',')[1]), forward=True) # размеры графика
         ax = fig.add_subplot(1,1,1)
         ax.margins(x=0) # убираем все поля лишние по бокам
         plt.xticks(size = in_size_ticks) # size размер подписи по оси x
@@ -62,18 +64,20 @@ async def async_setup_entry(hass: HomeAssistant, entry):
                     float(his_state) # для проверки что на входе число, иначе в исключение и продолжаем дальше
                     x_axis.append(his_last_updated)
                     y_axis.append(his_state)
-                except Exception:
-                    pass
-            x_axis = np.array(x_axis)
-            y_axis = np.array(y_axis).astype('float32')
-            w=np.hanning(in_linesmooth) # сглаживание графика
-            y_axis2=np.convolve(w/w.sum(),y_axis,mode='same')
+                except ValueError:
+                    x_axis.append(his_last_updated)
+                    y_axis.append(None)
+            if x_axis != [] and y_axis != []:
+                x_axis = np.array(x_axis)
+                y_axis = np.array(y_axis).astype('float32')
+                w=np.hanning(in_linesmooth) # сглаживание графика
+                y_axis2=np.convolve(w/w.sum(),y_axis,mode='same')
 
-            if in_lineinterp == 'linear_interp':
-                ax.plot(x_axis, y_axis2, label=label_name, linewidth = in_linewidth)
-            else:
-                new_where = 'pre' if in_lineinterp == 'vert_first' else 'post'
-                ax.step(x_axis, y_axis2, label=label_name, where = new_where, linewidth = in_linewidth)
+                if in_lineinterp == 'linear_interp':
+                    ax.plot(x_axis, y_axis2, label=label_name, linewidth = in_linewidth)
+                else:
+                    new_where = 'pre' if in_lineinterp == 'vert_first' else 'post'
+                    ax.step(x_axis, y_axis2, label=label_name, where = new_where, linewidth = in_linewidth)
 
         # в зависимости от кол-ва дней, разницы time_end и in_start, частота делений по x или пропускаем и автоматически
         if not in_rate_ticks:
@@ -84,10 +88,8 @@ async def async_setup_entry(hass: HomeAssistant, entry):
         ax.xaxis.set_major_formatter(xFmt)
         ax.legend(loc=2, ncol=2, shadow = True, fancybox = True, framealpha = 0.5, fontsize = 14) # подпись сенсоров
         fig.autofmt_xdate()
-        fig.savefig(in_folderfile, bbox_inches='tight') # сохраняем картинку
-        plt.clf()
-        ax.cla() 
-        fig.clf()
+        await hass.async_add_executor_job(fig.savefig, in_folderfile)
+        plt.close()
 
     hass.services.async_register(DOMAIN, 'create_graph_image', create_graph_image)
 
